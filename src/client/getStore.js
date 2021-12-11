@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getStore = void 0;
+var redux_1 = require("redux");
+var getDefaultState_1 = require("../server/getDefaultState");
+var initializeDB_1 = require("../server/db/initializeDB");
+var shared_1 = require("../shared");
+(0, initializeDB_1.initializeDB)();
+var currentUser = shared_1.users[0];
+var defaultState = (0, getDefaultState_1.getDefaultState)(currentUser);
+console.info(defaultState);
+var reducer = function (state) { return state; };
+var store = (0, redux_1.createStore)(reducer);
+var getStore = function () { return store; };
+exports.getStore = getStore;

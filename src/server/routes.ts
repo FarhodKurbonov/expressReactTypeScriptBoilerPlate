@@ -1,11 +1,8 @@
 import * as express from 'express';
-import {
-    channels,
-} from './db';
+import { channels, users } from '../shared';
+import { Channel } from './db';
+import {UserStatus} from "../shared/types/enums/userStatus";
 
-import {
-    users
-} from './db';
 
 const router = express.Router();
 
@@ -14,7 +11,7 @@ router.get('/api/hello', (req, res, next) => {
 });
 
 router.use('/channel/create/:channelID/:name/:participants',({params:{channelID,name,participants}},res)=>{
-    const channel = {
+    const channel: Channel = {
         id:channelID,
         name,
         participants:JSON.parse(participants),
@@ -28,8 +25,8 @@ router.use('/channel/:id',(req,res)=>{
     res.json(channels.find(channel=>channel.id === req.params.id));
 });
 
-router.use('/user/activeChannel/:userID/:channelID',({params:{userID,channelID}},res)=>{
-    users.find(user=>user.id === userID).activeChannel = channelID;
+router.use('/user/activeChannel/:userID/:channelID', ({params:{userID, channelID}},res)=>{
+    users.find(user=> user.id === userID).activeChannel = channelID;
     res.status(200).send(true);
 });
 
@@ -46,20 +43,20 @@ router.use('/status/:id/:status',({params:{id,status}},res)=>{
     const user = users
       .find(user=>user.id === id);
     if (user) {
-        user.status = status;
+        user.status = status as UserStatus;
         res.status(200).send();
     } else {
         res.status(404).send();
     }
 });
 
-export const createMessage = ({userID,channelID,messageID,input}) =>{
+export const createMessage = ({userID,channelID,messageID,input}:{userID: string, channelID:string, messageID:string, input:string }) =>{
     const channel = channels.find(channel=>channel.id === channelID);
 
     const message = {
         id:messageID,
         content:{
-            text:input
+            text: input
         },
         owner:userID
     };

@@ -1,13 +1,9 @@
-import {
-    channels,
-    users
-} from './'
-
-import {
-    template
-} from 'lodash';
-
+import {template} from 'lodash';
 import { Chance } from 'chance';
+import {channels, users} from "../../shared";
+import {FetchStatus} from "../../shared/types/enums/fetchStatus";
+import {UserStatus} from "../../shared/types/enums/userStatus";
+import {IMessage} from "../../shared/types/Interfaces/Message";
 const chance = new Chance();
 
 const messageActions = [`collate`,`port`,`merge`,`refactor`,`check`,`deploy`,`automate`,`debug`,`erase`,`cache`,`rebase`,`transpile`,`desync`,`fork`];
@@ -28,7 +24,7 @@ export const getRandomMessageText = ()=> template(chance.pick(templates))({
         object: chance.pick(messageObjects)
     });
 
-export const getRandomMessage = (userIDs)=>({
+export const getRandomMessage = (userIDs: string[])=>({
     id:chance.guid(),
     owner: chance.pick(userIDs),
     content: {
@@ -37,7 +33,7 @@ export const getRandomMessage = (userIDs)=>({
     date:chance.date({year:2017})
 });
 
-export const initializeDB = ()=>{
+export const initializeDB = ():void=>{
 
     const firstNames = [`Emily`,`Chuck`,`Andy`,`Edgar`,`Stephen`,`Pablo`,`Gustav`,`Jackson`,`Leonardo`];
     const lastNames = [`McCartney`,`Webber`,`Combs`,`John`,`Martin`,`Starr`,`Springstein`,`Simmons`,`Harrison`];
@@ -46,23 +42,24 @@ export const initializeDB = ()=>{
     while (userCount--) {
         users.push({
             name:`${chance.pick(firstNames)} ${chance.pick(lastNames)}`,
-            id: chance.guid(),
+            id: chance.guid() as string,
             contacts: [],
             channels:[],
-            fetchStatus:`FETCHED`,
-            status:chance.pick([`ONLINE`,`OFFLINE`,`AWAY`])
+            fetchStatus: FetchStatus.FETCHED,
+            status: chance.pick([`ONLINE`,`OFFLINE`,`AWAY`]) as UserStatus
         })
     }
 
     let contactCount = 6;
     users.forEach(user=>{
         for (let i = 0; i < contactCount; i++) {
-            user.contacts.push(chance.pick(users.filter(({id}) => id !== user.id && !user.contacts.includes(id))).id);
+            let contacts = users.filter(({id}) => id !== user.id && !user.contacts.includes(id))
+            user.contacts.push( chance.pick(contacts).id);
         }
     });
 
 
-    const getMessages = (userIDs,count = 12)=>{
+    const getMessages = (userIDs: string[],count = 12): IMessage[]=>{
         const messages = [];
         for (let i = count; i > 0; i--) {
             messages.push(getRandomMessage(userIDs));

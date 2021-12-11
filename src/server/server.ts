@@ -1,18 +1,12 @@
 import * as express from 'express';
 import apiRouter from './routes';
-
-
-
-import {
-  users
-} from './db/User';
+import { getDefaultState } from './getDefaultState'
+import { initializeDB } from './db/initializeDB';
+import {users} from "../shared";
 
 const app = express();
 
-import { getDefaultState } from './getDefaultState'
-import { initializeDB } from './db/initializeDB';
-
-initializeDB();
+let initProcessResult = initializeDB();
 const currentUser = users[0];
 app.use(express.static('public'));
 app.use(apiRouter);

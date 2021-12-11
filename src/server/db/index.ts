@@ -1,3 +1,3 @@
-export { Channel, channels } from './Channel';
-export { User, users } from './User';
+export { Channel } from './Channel';
+export { User } from './User';
 export { getRandomMessageText } from './initializeDB';
